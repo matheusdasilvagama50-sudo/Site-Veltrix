@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veltrix — Gerencie sua comunidade do Discord com precisão</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --purple:#7C6EE6;
+    --purple-dark:#5A4EC7;
+    --purple-light:#9E93F5;
+    --bg:#0A0A0F;
+    --bg2:#111118;
+    --bg3:#16161F;
+    --card:#1A1A26;
+    --border:rgba(124,110,230,0.18);
+    --border2:rgba(255,255,255,0.07);
+    --text:#FFFFFF;
+    --text2:#A8A8C0;
+    --text3:#6B6B85;
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+  h1,h2,h3,h4,nav .logo-text,.btn-primary,.btn-secondary,.stat-label,.badge,
+  .btn-nav,.plan-name,.plan-btn,.toggle-btn,.section-tag,.footer-col h4,
+  .cta-btn,.newsletter-btn,.hero-badge{font-family:'Syne',sans-serif}
+
+  /* ── NAV ── */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 60px;height:68px;
+    background:rgba(10,10,15,0.88);
+    backdrop-filter:blur(24px);
+    border-bottom:1px solid var(--border2);
+  }
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .logo-icon{
+    width:34px;height:34px;
+    background:linear-gradient(135deg,var(--purple),var(--purple-dark));
+    border-radius:9px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .logo-icon svg{width:19px;height:19px;fill:none;stroke:white;stroke-width:1.8}
+  .logo-text{font-size:19px;font-weight:700;color:var(--text)}
+  .nav-links{display:flex;align-items:center;gap:34px}
+  .nav-links a{
+    color:var(--text2);text-decoration:none;
+    font-size:14px;font-weight:500;
+    transition:color .2s;
+    font-family:'Syne',sans-serif;
+  }
+  .nav-links a:hover{color:var(--text)}
+  .nav-right{display:flex;align-items:center;gap:12px}
+  .btn-nav{
+    padding:9px 22px;border-radius:100px;
+    font-size:13px;font-weight:600;cursor:pointer;
+    border:none;transition:all .2s;
+    font-family:'Syne',sans-serif;
+  }
+  .btn-ghost{
+    background:transparent;color:var(--text2);
+    border:1px solid var(--border2);
+  }
+  .btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.2)}
+  .btn-fill{background:var(--purple);color:white}
+  .btn-fill:hover{background:var(--purple-dark)}
+
+  /* ── HERO ── */
+  .hero{
+    min-height:100vh;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    text-align:center;
+    padding:100px 40px 80px;
+    position:relative;overflow:hidden;
+  }
+  .hero-grid{
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(124,110,230,0.04) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(124,110,230,0.04) 1px,transparent 1px);
+    background-size:64px 64px;
+    pointer-events:none;
+  }
+  .hero-glow{
+    position:absolute;
+    width:700px;height:700px;border-radius:50%;
+    background:radial-gradient(circle,rgba(124,110,230,0.14) 0%,transparent 68%);
+    top:50%;left:50%;transform:translate(-50%,-50%);
+    pointer-events:none;
+  }
+  .hero-badge{
+    position:relative;z-index:1;
+    display:inline-flex;align-items:center;gap:9px;
+    background:rgba(124,110,230,0.1);
+    border:1px solid rgba(124,110,230,0.28);
+    border-radius:100px;padding:7px 18px;
+    font-size:12px;font-weight:600;
+    color:var(--purple-light);
+    margin-bottom:30px;
+    letter-spacing:.5px;
+  }
+  .hero-badge .dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--purple-light);
+    animation:pulse 2s infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  h1{
+    position:relative;z-index:1;
+    font-size:clamp(42px,6.5vw,84px);
+    font-weight:800;line-height:1.08;
+    letter-spacing:-2.5px;
+    margin-bottom:26px;
+  }
+  h1 .accent{color:var(--purple-light)}
+  .hero-sub{
+    position:relative;z-index:1;
+    font-size:18px;color:var(--text2);
+    max-width:580px;line-height:1.75;
+    margin-bottom:44px;font-weight:300;
+  }
+  .hero-btns{
+    position:relative;z-index:1;
+    display:flex;align-items:center;gap:16px;
+    flex-wrap:wrap;justify-content:center;
+  }
+  .btn-primary{
+    padding:15px 36px;background:var(--purple);
+    color:white;border:none;border-radius:100px;
+    font-size:15px;font-weight:700;cursor:pointer;
+    transition:all .25s;
+  }
+  .btn-primary:hover{
+    background:var(--purple-dark);
+    transform:translateY(-2px);
+    box-shadow:0 10px 36px rgba(124,110,230,0.42);
+  }
+  .btn-secondary{
+    padding:15px 36px;background:transparent;
+    color:var(--text);
+    border:1px solid rgba(255,255,255,0.14);
+    border-radius:100px;font-size:15px;font-weight:600;
+    cursor:pointer;transition:all .25s;
+  }
+  .btn-secondary:hover{
+    border-color:rgba(255,255,255,0.34);
+    transform:translateY(-2px);
+  }
+
+  /* ── STATS ── */
+  .stats{
+    background:var(--bg2);
+    border-top:1px solid var(--border2);
+    border-bottom:1px solid var(--border2);
+    padding:52px 60px;
+  }
+  .stats-inner{
+    max-width:920px;margin:0 auto;
+    display:grid;grid-template-columns:repeat(3,1fr);
+    gap:40px;text-align:center;
+  }
+  .stat-number{
+    font-family:'Syne',sans-serif;
+    font-size:clamp(36px,4.5vw,56px);
+    font-weight:800;color:var(--text);
+  }
+  .stat-label{
+    font-size:11px;font-weight:600;
+    color:var(--text3);
+    letter-spacing:2.5px;text-transform:uppercase;
+    margin-top:6px;
+  }
+
+  /* ── SHARED SECTION ── */
+  .section-wrap{padding:100px 60px;max-width:1160px;margin:0 auto}
+  .section-tag{
+    display:inline-block;
+    font-size:11px;font-weight:700;
+    letter-spacing:2.5px;text-transform:uppercase;
+    color:var(--purple-light);
+    margin-bottom:16px;
+  }
+  .section-title{
+    font-size:clamp(30px,4vw,52px);
+    font-weight:800;margin-bottom:16px;
+    letter-spacing:-1.5px;line-height:1.1;
+  }
+  .section-sub{
+    font-size:17px;color:var(--text2);
+    max-width:520px;line-height:1.75;font-weight:300;
+  }
+
+  /* ── FEATURES ── */
+  .features-grid{
+    display:grid;grid-template-columns:repeat(2,1fr);
+    gap:16px;margin-top:64px;
+  }
+  .feature-card{
+    background:var(--card);
+    border:1px solid var(--border2);
+    border-radius:18px;padding:34px;
+    transition:all .3s;cursor:default;
+  }
+  .feature-card:hover{
+    border-color:var(--border);
+    transform:translateY(-5px);
+    box-shadow:0 20px 60px rgba(0,0,0,0.35);
+  }
+  .feature-icon{
+    width:48px;height:48px;
+    background:rgba(124,110,230,0.11);
+    border-radius:13px;
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:22px;
+  }
+  .feature-icon svg{
+    width:23px;height:23px;
+    stroke:var(--purple-light);fill:none;stroke-width:1.6;
+  }
+  .feature-card h3{
+    font-size:17px;font-weight:700;
+    margin-bottom:11px;
+    font-family:'Syne',sans-serif;
+  }
+  .feature-card p{
+    font-size:14px;color:var(--text2);
+    line-height:1.75;font-weight:300;
+  }
+
+  /* ── TESTIMONIALS ── */
+  .testimonials-outer{
+    background:var(--bg2);
+    border-top:1px solid var(--border2);
+    border-bottom:1px solid var(--border2);
+    padding:100px 60px;
+  }
+  .testimonials-inner{max-width:1160px;margin:0 auto;text-align:center}
+  .testimonials-grid{
+    display:grid;grid-template-columns:repeat(2,1fr);
+    gap:16px;margin-top:64px;text-align:left;
+  }
+  .testimonial-card{
+    background:var(--card);
+    border:1px solid var(--border2);
+    border-radius:18px;padding:30px;
+    transition:border-color .3s;
+  }
+  .testimonial-card:hover{border-color:var(--border)}
+  .testimonial-card p{
+    font-size:14px;color:var(--text2);
+    line-height:1.8;font-weight:300;
+    margin-bottom:22px;font-style:italic;
+  }
+  .testimonial-author{display:flex;align-items:center;gap:13px}
+  .avatar{
+    width:38px;height:38px;border-radius:50%;
+    background:rgba(124,110,230,0.2);
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:700;
+    color:var(--purple-light);
+    font-family:'Syne',sans-serif;flex-shrink:0;
+  }
+  .author-name{font-size:13px;font-weight:700;font-family:'Syne',sans-serif}
+  .author-role{font-size:12px;color:var(--text3);margin-top:2px}
+
+  /* ── PRICING ── */
+  .pricing-outer{padding:100px 60px;text-align:center}
+  .pricing-inner-wrap{max-width:1060px;margin:0 auto}
+  .toggle-wrap{
+    display:inline-flex;
+    background:var(--card);
+    border:1px solid var(--border2);
+    border-radius:100px;padding:4px;
+    margin-top:44px;margin-bottom:64px;
+  }
+  .toggle-btn{
+    padding:9px 26px;border-radius:100px;
+    border:none;cursor:pointer;
+    font-size:13px;font-weight:700;
+    transition:all .22s;
+    background:transparent;color:var(--text3);
+  }
+  .toggle-btn.active{background:var(--purple);color:white}
+  .toggle-badge{
+    background:rgba(124,110,230,0.2);
+    color:var(--purple-light);
+    font-size:10px;padding:2px 9px;
+    border-radius:100px;margin-left:8px;
+    font-family:'Syne',sans-serif;font-weight:700;
+  }
+  .pricing-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);
+    gap:16px;align-items:stretch;
+  }
+  .pricing-card{
+    background:var(--card);
+    border:1px solid var(--border2);
+    border-radius:22px;padding:38px 34px;
+    text-align:left;display:flex;flex-direction:column;
+    position:relative;
+    transition:border-color .3s;
+  }
+  .pricing-card:hover{border-color:var(--border)}
+  .pricing-card.featured{
+    background:var(--purple);
+    border-color:var(--purple);
+    overflow:hidden;
+  }
+  .pricing-card.featured::before{
+    content:'';position:absolute;
+    top:-70px;right:-70px;
+    width:220px;height:220px;
+    background:rgba(255,255,255,0.06);
+    border-radius:50%;
+  }
+  .popular-badge{
+    position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+    background:white;color:var(--purple-dark);
+    font-size:10px;font-weight:800;
+    padding:4px 18px;
+    border-radius:0 0 11px 11px;
+    font-family:'Syne',sans-serif;
+    letter-spacing:1.5px;text-transform:uppercase;
+    white-space:nowrap;
+  }
+  .plan-name{
+    font-size:15px;font-weight:700;
+    color:var(--text2);margin-bottom:10px;
+  }
+  .pricing-card.featured .plan-name{color:rgba(255,255,255,0.72)}
+  .plan-price{
+    font-size:clamp(34px,3.5vw,48px);
+    font-weight:800;line-height:1;
+    margin-bottom:6px;
+    font-family:'Syne',sans-serif;
+  }
+  .plan-period{font-size:13px;color:var(--text3)}
+  .pricing-card.featured .plan-period{color:rgba(255,255,255,0.58)}
+  .plan-desc{
+    font-size:13px;color:var(--text3);
+    margin:18px 0 30px;line-height:1.65;font-weight:300;
+  }
+  .pricing-card.featured .plan-desc{color:rgba(255,255,255,0.58)}
+  .plan-features{
+    list-style:none;
+    display:flex;flex-direction:column;gap:13px;
+    flex:1;margin-bottom:34px;
+  }
+  .plan-features li{
+    display:flex;align-items:center;gap:11px;
+    font-size:14px;color:var(--text2);font-weight:300;
+  }
+  .pricing-card.featured .plan-features li{color:rgba(255,255,255,0.88)}
+  .check{
+    width:19px;height:19px;
+    background:rgba(124,110,230,0.15);
+    border-radius:50%;display:flex;
+    align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .pricing-card.featured .check{background:rgba(255,255,255,0.18)}
+  .check svg{width:10px;height:10px;stroke:var(--purple-light);fill:none;stroke-width:2.5}
+  .pricing-card.featured .check svg{stroke:white}
+  .plan-btn{
+    padding:14px;border-radius:100px;
+    font-size:14px;font-weight:700;cursor:pointer;
+    transition:all .22s;
+    font-family:'Syne',sans-serif;
+    text-align:center;border:none;width:100%;
+  }
+  .plan-btn-outline{
+    background:transparent;color:var(--text);
+    border:1px solid rgba(255,255,255,0.12);
+  }
+  .plan-btn-outline:hover{border-color:rgba(255,255,255,0.3)}
+  .plan-btn-white{
+    background:rgba(0,0,0,0.22);color:white;
+    border:1px solid rgba(255,255,255,0.22);
+  }
+  .plan-btn-white:hover{background:rgba(0,0,0,0.38)}
+  .plan-btn-ghost{
+    background:transparent;color:var(--text2);
+    font-size:13px;border:1px solid var(--border2);
+  }
+  .plan-btn-ghost:hover{border-color:rgba(255,255,255,0.2);color:var(--text)}
+
+  /* ── CTA ── */
+  .cta-outer{padding:0 60px 100px}
+  .cta-inner{
+    max-width:1060px;margin:0 auto;
+    background:linear-gradient(135deg,rgba(124,110,230,0.16) 0%,rgba(90,78,199,0.11) 100%);
+    border:1px solid rgba(124,110,230,0.26);
+    border-radius:30px;padding:80px 60px;
+    position:relative;overflow:hidden;
+    text-align:center;
+  }
+  .cta-inner::before{
+    content:'';position:absolute;
+    width:340px;height:340px;border-radius:50%;
+    background:rgba(124,110,230,0.09);
+    top:-120px;right:-120px;pointer-events:none;
+  }
+  .cta-inner::after{
+    content:'';position:absolute;
+    width:200px;height:200px;border-radius:50%;
+    background:rgba(124,110,230,0.07);
+    bottom:-80px;left:-60px;pointer-events:none;
+  }
+  .cta-inner h2{
+    font-size:clamp(30px,4vw,48px);
+    font-weight:800;margin-bottom:16px;
+    letter-spacing:-1.5px;
+    position:relative;z-index:1;
+  }
+  .cta-inner p{
+    font-size:17px;color:var(--text2);
+    margin-bottom:40px;font-weight:300;
+    position:relative;z-index:1;
+  }
+  .cta-btn{
+    position:relative;z-index:1;
+    display:inline-flex;align-items:center;gap:11px;
+    padding:17px 40px;
+    background:white;color:#0A0A0F;
+    border:none;border-radius:100px;
+    font-size:15px;font-weight:700;cursor:pointer;
+    font-family:'Syne',sans-serif;transition:all .25s;
+  }
+  .cta-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 16px 44px rgba(255,255,255,0.14);
+  }
+  .cta-btn svg{
+    width:18px;height:18px;
+    fill:none;stroke:currentColor;stroke-width:2.2;
+  }
+
+  /* ── FOOTER ── */
+  footer{
+    background:var(--bg2);
+    border-top:1px solid var(--border2);
+    padding:70px 60px 36px;
+  }
+  .footer-grid{
+    max-width:1160px;margin:0 auto;
+    display:grid;
+    grid-template-columns:2.2fr 1fr 1fr 2fr;
+    gap:64px;margin-bottom:56px;
+  }
+  .footer-brand .logo{margin-bottom:18px;display:inline-flex}
+  .footer-brand p{
+    font-size:14px;color:var(--text3);
+    line-height:1.75;font-weight:300;max-width:250px;
+  }
+  .footer-social{display:flex;gap:10px;margin-top:22px}
+  .social-btn{
+    width:34px;height:34px;
+    border:1px solid var(--border2);
+    border-radius:9px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:all .2s;
+  }
+  .social-btn:hover{border-color:rgba(255,255,255,0.22)}
+  .social-btn svg{
+    width:15px;height:15px;
+    fill:none;stroke:var(--text3);stroke-width:1.8;
+  }
+  .footer-col h4{
+    font-size:11px;font-weight:700;
+    letter-spacing:2px;text-transform:uppercase;
+    color:var(--text3);margin-bottom:18px;
+  }
+  .footer-col a{
+    display:block;font-size:14px;color:var(--text2);
+    text-decoration:none;margin-bottom:12px;
+    transition:color .2s;font-weight:300;
+  }
+  .footer-col a:hover{color:var(--text)}
+  .newsletter-col h4{
+    font-size:11px;font-weight:700;
+    letter-spacing:2px;text-transform:uppercase;
+    color:var(--text3);margin-bottom:18px;
+    font-family:'Syne',sans-serif;
+  }
+  .newsletter-desc{
+    font-size:13px;color:var(--text3);
+    margin-bottom:16px;font-weight:300;line-height:1.65;
+  }
+  .newsletter-row{display:flex;gap:8px}
+  .newsletter-input{
+    flex:1;
+    background:var(--card);
+    border:1px solid var(--border2);
+    border-radius:9px;padding:11px 14px;
+    color:var(--text);font-size:13px;
+    font-family:'DM Sans',sans-serif;
+    outline:none;transition:border-color .2s;
+  }
+  .newsletter-input::placeholder{color:var(--text3)}
+  .newsletter-input:focus{border-color:rgba(124,110,230,0.42)}
+  .newsletter-btn{
+    padding:11px 20px;background:var(--purple);
+    color:white;border:none;border-radius:9px;
+    font-size:13px;font-weight:700;cursor:pointer;
+    font-family:'Syne',sans-serif;
+    transition:background .2s;white-space:nowrap;
+  }
+  .newsletter-btn:hover{background:var(--purple-dark)}
+  .footer-bottom{
+    max-width:1160px;margin:0 auto;
+    border-top:1px solid var(--border2);
+    padding-top:26px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .footer-bottom p{font-size:12px;color:var(--text3)}
+  .footer-bottom-links{display:flex;gap:22px}
+  .footer-bottom-links a{
+    font-size:12px;color:var(--text3);
+    text-decoration:none;transition:color .2s;
+  }
+  .footer-bottom-links a:hover{color:var(--text2)}
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+  .hero-badge{animation:fadeUp .7s ease both .1s}
+  .hero h1{animation:fadeUp .7s ease both .22s}
+  .hero .hero-sub{animation:fadeUp .7s ease both .34s}
+  .hero .hero-btns{animation:fadeUp .7s ease both .46s}
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:900px){
+    nav{padding:0 24px}
+    .nav-links{display:none}
+    .hero{padding:90px 24px 60px}
+    .stats{padding:52px 24px}
+    .stats-inner{grid-template-columns:1fr;gap:28px}
+    .section-wrap{padding:72px 24px}
+    .features-grid,.testimonials-grid,.pricing-grid{grid-template-columns:1fr}
+    .testimonials-outer{padding:72px 24px}
+    .pricing-outer{padding:72px 24px}
+    .cta-outer{padding:0 24px 72px}
+    .cta-inner{padding:56px 28px}
+    footer{padding:56px 24px 28px}
+    .footer-grid{grid-template-columns:1fr 1fr;gap:36px}
+    .footer-grid>:first-child{grid-column:1/-1}
+    .footer-grid>:last-child{grid-column:1/-1}
+    .footer-bottom{flex-direction:column;gap:16px;text-align:center}
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    </div>
+    <span class="logo-text">Veltrix</span>
+  </a>
+
+  <div class="nav-links">
+    <a href="#">Início</a>
+    <a href="#features">Recursos</a>
+    <a href="#pricing">Planos</a>
+    <a href="#">Documentos</a>
+    <a href="#">Blog</a>
+    <a href="#">Comunidade</a>
+  </div>
+
+  <div class="nav-right">
+    <button class="btn-nav btn-ghost">Conectar-se</button>
+    <button class="btn-nav btn-fill">Comece agora</button>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Plataforma de gestão para Discord
+  </div>
+
+  <h1>Gerencie sua comunidade<br>do Discord com <span class="accent">precisão.</span></h1>
+
+  <p class="hero-sub">
+    Substitua dezenas de bots desajeitados por uma plataforma poderosa
+    e com design elegante, criada para comunidades modernas.
+  </p>
+
+  <div class="hero-btns">
+    <button class="btn-primary">Comece gratuitamente</button>
+    <button class="btn-secondary">Ver documentação &rarr;</button>
+  </div>
+</section>
+
+<!-- ── STATS ── -->
+<div class="stats">
+  <div class="stats-inner">
+    <div>
+      <div class="stat-number">12,4 mil+</div>
+      <div class="stat-label">Servidores ativos</div>
+    </div>
+    <div>
+      <div class="stat-number">2,8M+</div>
+      <div class="stat-label">Membros da comunidade</div>
+    </div>
+    <div>
+      <div class="stat-number">450M+</div>
+      <div class="stat-label">Comandos executados</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FEATURES ── -->
+<section id="features">
+  <div class="section-wrap">
+    <div class="section-tag">Recursos</div>
+    <h2 class="section-title">Tudo que você precisa<br>para crescer</h2>
+    <p class="section-sub">
+      Ferramentas desenvolvidas especificamente para manter sua comunidade
+      engajada, segura e ativa.
+    </p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>Moderação Avançada</h3>
+        <p>Proteja sua comunidade com filtragem automática de spam, proteção anti-invasão e conjuntos de regras personalizáveis.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        </div>
+        <h3>Comandos personalizados</h3>
+        <p>Crie comandos de barra poderosos com um construtor visual. Não é necessário programar para criar fluxos de trabalho complexos.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <h3>Análises detalhadas</h3>
+        <p>Acompanhe a retenção de membros, os horários de pico de atividade e as métricas de engajamento em um painel intuitivo.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <h3>Fluxos de trabalho automatizados</h3>
+        <p>Configure alertas para quando membros entrarem, saírem ou atingirem marcos importantes dentro da sua comunidade.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h3>Gestão de funções</h3>
+        <p>Funções autoatribuíveis, funções temporárias e hierarquias de permissões complexas simplificadas.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </div>
+        <h3>Integrações perfeitas</h3>
+        <p>Conecte-se com suas ferramentas favoritas — Twitch, YouTube, GitHub e muito mais. Tudo em um só lugar.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ── -->
+<div class="testimonials-outer">
+  <div class="testimonials-inner">
+    <div class="section-tag">Depoimentos</div>
+    <h2 class="section-title">Aprovado pelos líderes comunitários</h2>
+
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <p>"O Veltrix transformou completamente a forma como moderamos nosso servidor com mais de 50 mil usuários. Os fluxos de trabalho automatizados nos economizaram horas."</p>
+        <div class="testimonial-author">
+          <div class="avatar">L</div>
+          <div>
+            <div class="author-name">Lúcia Torres</div>
+            <div class="author-role">Gerente de Comunidade</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <p>"O painel de análise é excelente. Finalmente entendi quando meu público está mais ativo e consigo planejar conteúdo com muito mais precisão."</p>
+        <div class="testimonial-author">
+          <div class="avatar">K</div>
+          <div>
+            <div class="author-name">Kwame Asante</div>
+            <div class="author-role">Criador de conteúdo</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <p>"O melhor construtor de comandos personalizados que já usei. Migramos de três bots diferentes para apenas o Veltrix — muito mais simples."</p>
+        <div class="testimonial-author">
+          <div class="avatar">M</div>
+          <div>
+            <div class="author-name">Maya Chen</div>
+            <div class="author-role">Administradora do servidor</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <p>"Os recursos anti-ataque foram ativados automaticamente durante um ataque de bots. Mantiveram nossa comunidade perfeitamente segura."</p>
+        <div class="testimonial-author">
+          <div class="avatar">R</div>
+          <div>
+            <div class="author-name">Raj Patel</div>
+            <div class="author-role">Líder de Esports</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PRICING ── -->
+<section id="pricing" class="pricing-outer">
+  <div class="pricing-inner-wrap">
+    <div class="section-tag">Preços</div>
+    <h2 class="section-title">Simples e transparentes</h2>
+    <p style="font-size:17px;color:var(--text2);font-weight:300">
+      Comece gratuitamente e faça upgrade quando precisar de mais recursos.
+    </p>
+
+    <div class="toggle-wrap">
+      <button class="toggle-btn active" onclick="setPricing('mensal',this)">Mensal</button>
+      <button class="toggle-btn" onclick="setPricing('anual',this)">
+        Anualmente <span class="toggle-badge">-20%</span>
+      </button>
+    </div>
+
+    <div class="pricing-grid">
+      <!-- FREE -->
+      <div class="pricing-card">
+        <div class="plan-name">Livre</div>
+        <div class="plan-price">$0</div>
+        <div class="plan-period">/mês</div>
+        <div class="plan-desc">Ideal para pequenas comunidades em crescimento.</div>
+        <ul class="plan-features">
+          <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>Ferramentas básicas de moderação</li>
+          <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>Até 2 servidores</li>
+          <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>5 comandos personalizados</li>
+          <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>Apoio comunitário</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline">Comece grátis</button>
+      </div>
+
+      <!-- PRO -->
+      <div class="pricing-card featured">
+        <div class="popular-badge">MAIS POPULAR</div>
+        <div class="plan-name">Pró</div>
+        <div class="plan-price" id="pro-price">US$ 9,99</div>
+        <div class="plan-period">/mês</div>
+        <div class="plan-desc">Funcionalidades avançadas para proprietários de servidores exigentes.</div>
+        <ul class="plan-features">
+          <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>Automações avançadas</li>
+          <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>Servidores ilimitados</li>
+          <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>Comandos ilimitados</li>
+          <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>Painel de análise</li>
+          <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>Suporte prioritário</li>
+        </ul>
+        <button class="plan-btn plan-btn-white">Escolha Pro</button>
+      </div>
+
+      <!-- ENTERPRISE -->
+      <div class="pricing-card">
+        <div class="plan-name">Empresa</div>
+        <div class="plan-price" id="ent-price">US$ 29,99</div>
+        <div class="plan-period">/mês</div>
+        <div class="plan-desc">Escala incomparável e suporte dedicado para grandes operações.</div>
+        <ul class="plan-features">
+          <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>Tudo no Pro</li>
+          <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>Personalização da marca do bot</li>
+          <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>Acesso à API</li>
+          <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>Gerente de conta dedicado</li>
+          <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>Garantia de SLA</li>
+        </ul>
+        <button class="plan-btn plan-btn-ghost">Contate o departamento de vendas</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<div class="cta-outer">
+  <div class="cta-inner">
+    <h2>Pronto para dar um<br>upgrade no seu servidor?</h2>
+    <p>Junte-se a milhares de gestores de comunidades que estão criando espaços melhores com a Veltrix.</p>
+    <button class="cta-btn">
+      Convide Veltrix para o Discord
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-grid">
+    <!-- Brand -->
+    <div class="footer-brand">
+      <a href="#" class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <span class="logo-text" style="font-size:17px">Veltrix</span>
+      </a>
+      <p>Gerenciamento de bots do Discord de nível empresarial. Simplifique a moderação, a automação e o engajamento da comunidade.</p>
+      <div class="footer-social">
+        <div class="social-btn" title="Discord">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="social-btn" title="Twitter/X">
+          <svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
+        </div>
+        <div class="social-btn" title="GitHub">
+          <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product links -->
+    <div class="footer-col">
+      <h4>Produto</h4>
+      <a href="#">Características</a>
+      <a href="#">Preços</a>
+      <a href="#">Integrações</a>
+      <a href="#">Registro de alterações</a>
+    </div>
+
+    <!-- Resources links -->
+    <div class="footer-col">
+      <h4>Recursos</h4>
+      <a href="#">Documentação</a>
+      <a href="#">Blog</a>
+      <a href="#">Comunidade</a>
+      <a href="#">Central de suporte</a>
+    </div>
+
+    <!-- Newsletter -->
+    <div class="newsletter-col">
+      <h4>Mantenha-se atualizado</h4>
+      <p class="newsletter-desc">
+        Receba as últimas notícias e atualizações diretamente na sua caixa de entrada.
+      </p>
+      <div class="newsletter-row">
+        <input class="newsletter-input" type="email" placeholder="Insira seu e-mail">
+        <button class="newsletter-btn">Inscreva-se</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2026 Veltrix Inc. Todos os direitos reservados.</p>
+    <div class="footer-bottom-links">
+      <a href="#">Política de Privacidade</a>
+      <a href="#">Termos de Serviço</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function setPricing(mode, el) {
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    const prices = mode === 'anual'
+      ? { pro: 'US$ 7,99', ent: 'US$ 23,99' }
+      : { pro: 'US$ 9,99', ent: 'US$ 29,99' };
+    document.getElementById('pro-price').textContent = prices.pro;
+    document.getElementById('ent-price').textContent = prices.ent;
+  }
+
+  // Smooth scroll for nav anchors
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+
+  // Newsletter submit
+  document.querySelector('.newsletter-btn').addEventListener('click', () => {
+    const input = document.querySelector('.newsletter-input');
+    if (input.value && input.value.includes('@')) {
+      input.value = '';
+      input.placeholder = '✓ Inscrito com sucesso!';
+      setTimeout(() => input.placeholder = 'Insira seu e-mail', 3000);
+    }
+  });
+</script>
+</body>
+      </html>
